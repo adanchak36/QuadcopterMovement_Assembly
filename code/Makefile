@@ -1,4 +1,5 @@
 all: 
-	gcc -c moveCopter.s && ld moveCopter.o 
+	nasm -felf64 moveCopter.asm && ld moveCopter.o
+
 clean: 
-	rm -f *.o 
+	rm -f *.o
