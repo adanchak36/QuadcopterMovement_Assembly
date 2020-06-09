@@ -1,3 +1,6 @@
+.section .bss #empty values
+	.comm buff, 5
+
 .section .rodata #read only data section
 	.align 8 #8 byte memory alignment for jump table
 .L0: 
@@ -14,23 +17,18 @@
 .section .data
 	requestInput: .string "Enter rotor quadcopter movement\n"
 
-
 .section .text #Instructions
 	.global _start  
 
 _start: 
+	#Loop waiting for 
 	callq getSignal
-	
-	#debug
-	movq $2, %rdi
-	
-	callq moveToRotorFunction
+
+	callq printInput
 
 	callq exitProgram
 
-
-
-getSignal: 
+getSignal: #int getSignal() 
 	#write(1, requestInput, 32)
 	movq $1, %rax
 	movq $1, %rdi
@@ -41,12 +39,22 @@ getSignal:
 	#read in an 8 bit ASCII character from STDIN
 
 	#read(file descriptor, buffer, len(buffer))
-#	movq $0, %rax
-#	movq $0, %rdi
+	xorq %rax, %rax #syscall for read = 0 
+	xorq %rdi, %rdi #file descriptor = stdin = 0
+	movq $buff, %rsi
+	movq $5, %rdx
+	syscall
 	ret 
 
-moveToRotorFunction: 
-	jmp *.L0(,%rdi,8) #indirect jump Mem[start of table + [rdi] + 8] 
+printInput: 
+	movq $1, %rax
+	movq $1, %rdi
+	movq $buff, %rsi
+	movq $5, %rdx
+	ret
+
+moveToRotorFunction: #moveToRotorFunction(int signal, int R1, int R2, int R3, int R4);  
+	jmp *.L0(,%rdi,8) #indirect jump Mem[start of table + [rdi] * 8] 
 	
 	
 	.L1: #x = 1 (Throttle: move down)
@@ -91,9 +99,6 @@ moveToRotorFunction:
 	.L9: #extra casedd? 
 		ret
  
-	
-		
-
 
 exitProgram: 
 	#exit(0)
