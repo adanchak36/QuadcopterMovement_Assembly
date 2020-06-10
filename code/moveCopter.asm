@@ -13,13 +13,16 @@ section .text
 	global _start	
 
 _start: 
+	call main
+	call exitProgram
+
+main: 
 	call printReqInput
 	call getsignalInput
 	call printbuff
-
 	call checkSignal
+	ret
 	
-	call exitProgram
 
 printReqInput: 
 	mov rax, 1
@@ -56,6 +59,7 @@ checkSignal:
 	; Compare input to 'A'
 	mov dil, [buff]
 	mov sil, 'A'
+	cmp dil, sil
 	jne badCall
 	ret 
 
