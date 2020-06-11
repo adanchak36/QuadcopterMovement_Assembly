@@ -41,7 +41,6 @@ section .text
 
 _start: 
 	call main
-	call exitProgram
 
 main: 
 	call setupInstructions
@@ -49,6 +48,7 @@ main:
 	call getsignalInput
 	call printbuff
 	call checkSignal
+	call _start
 	ret
 
 setupInstructions:
@@ -179,12 +179,12 @@ printbuff:
 checkSignal: 
 	; Compare input to 'A'
 	mov dil, [buff]
-	mov sil, 'A'
 	mov rdx, 4
 	call move1 ;start of big if/else statement
 	ret 
 
-move1: 
+move1: ;'A'
+	mov sil, 'A'
 	cmp dil, sil 
 	jne move2
 	;All rotors set to low speed (0)
@@ -195,20 +195,101 @@ move1:
 	mov dword [R4], 0
 	ret
 
-move2: 
+move2: ;'B' 
+	mov sil, 'B'
+	cmp dil, sil
+	jne move3
+	;All rotors set to high speed (1)
 	call printMoveB
+	mov dword [R1], 1
+        mov dword [R2], 1
+        mov dword [R3], 1
+        mov dword [R4], 1
 	ret
 
-
-move3: 
+move3: ;'C'
+	mov sil, 'C' 
+	cmp dil, sil
+	jne move4
+	;R1/R4 set to high speed
+	;R2/R3 set to low speed
 	call printMoveC
+	mov dword [R1], 1
+        mov dword [R2], 0
+        mov dword [R3], 0
+        mov dword [R4], 1	
 	ret
 
 
-move4: 
-	call printMoveD
+move4: ;'D' 
+	mov sil, 'D'
+	cmp dil, sil
+        jne move5
+        call printMoveD
+        mov dword [R1], 0
+        mov dword [R2], 1
+        mov dword [R3], 1
+        mov dword [R4], 0       
+        ret
+
+move5: ;'E'
+	mov sil, 'E'
+	cmp dil, sil
+        jne move6
+        ;R3/R4 set to high speed
+        ;R1/R2 set to low speed
+        call printMoveE
+        mov dword [R1], 0
+        mov dword [R2], 0
+        mov dword [R3], 1
+        mov dword [R4], 1       
+        ret
+
+move6: ;'F'
+	mov sil, 'F'
+	cmp dil, sil
+	jne move7
+	;R1/R2 set to high speed
+	;R3/R4 set to low speed
+	call printMoveF
+        mov dword [R1], 1
+        mov dword [R2], 1
+        mov dword [R3], 0
+        mov dword [R4], 0
+        ret
+
+move7: ;'G'
+	mov sil, 'G'
+	cmp dil, sil
+	jne move8
+	;R1/R3 set to high speed
+	;R2/R4 set to low speed
+	call printMoveG
+	mov dword [R1], 1
+        mov dword [R2], 0
+        mov dword [R3], 1
+        mov dword [R4], 0
+        ret
+
+move8: ;'H'
+	mov sil, 'H'
+	cmp dil, sil
+	jne move9
+	;R2/R4 set to high speed
+	;R1/R3 set to low speed
+	call printMoveH
+	mov dword [R1], 0
+        mov dword [R2], 1
+        mov dword [R3], 0
+        mov dword [R4], 1
+        ret
+
+move9: 
+	call printQuitMessage
+	call exitProgram
 	ret
-	
+
+
 
 badCall: 
 	mov rax, 1
