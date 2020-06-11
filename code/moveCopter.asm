@@ -5,6 +5,11 @@ section .data
 
 	textIntro: db "Welcome: Below are your commands to control the quadcopter", 0xA ;len 59
 	lenIntro: equ $-textIntro
+	
+	R1: dw 0
+	R2: dw 0
+	R3: dw 0
+	R4: dw 0
 
 	;be careful all contigous in memory
 	text1: db  "A - Throttle: move down", 0xA ;len 23 
@@ -175,9 +180,35 @@ checkSignal:
 	; Compare input to 'A'
 	mov dil, [buff]
 	mov sil, 'A'
-	cmp dil, sil
-	jne badCall
+	mov rdx, 4
+	call move1 ;start of big if/else statement
 	ret 
+
+move1: 
+	cmp dil, sil 
+	jne move2
+	;All rotors set to low speed (0)
+	call printMoveA
+	mov dword [R1], 0
+	mov dword [R2], 0
+	mov dword [R3], 0
+	mov dword [R4], 0
+	ret
+
+move2: 
+	call printMoveB
+	ret
+
+
+move3: 
+	call printMoveC
+	ret
+
+
+move4: 
+	call printMoveD
+	ret
+	
 
 badCall: 
 	mov rax, 1
